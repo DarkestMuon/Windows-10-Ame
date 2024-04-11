@@ -80,12 +80,6 @@ set /P drive=
 if %drive%==exit GOTO menu
 	dism /online /enable-feature /featurename:NetFX3 /All /Source:%drive%\sources\sxs /LimitAccess
 
-cls
-echo.
-echo  :: Disabling Windows Update
-timeout /t 2 /nobreak > NUL
-net stop wuauserv
-sc config wuauserv start= disabled
 
 cls
 echo.
@@ -102,8 +96,6 @@ reg add "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\Dat
 cls
 schtasks /change /TN "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /DISABLE > NUL 2>&1
 cls
-schtasks /change /TN "\Microsoft\Windows\Application Experience\ProgramDataUpdater" /DISABLE > NUL 2>&1
-cls
 schtasks /change /TN "\Microsoft\Windows\Customer Experience Improvement Program\Consolidator" /DISABLE > NUL 2>&1
 cls
 schtasks /change /TN "\Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask" /DISABLE > NUL 2>&1
@@ -111,8 +103,6 @@ cls
 schtasks /change /TN "\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip" /DISABLE > NUL 2>&1
 cls
 schtasks /delete /TN "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /f > NUL 2>&1
-cls
-schtasks /delete /TN "\Microsoft\Windows\Application Experience\ProgramDataUpdater" /f > NUL 2>&1
 cls
 schtasks /delete /TN "\Microsoft\Windows\Application Experience\StartupAppTask" /f > NUL 2>&1
 cls
@@ -126,129 +116,7 @@ schtasks /delete /TN "\Microsoft\Windows\Maps\MapsToastTask" /f > NUL 2>&1
 cls
 schtasks /delete /TN "\Microsoft\Windows\Maps\MapsUpdateTask" /f > NUL 2>&1
 cls
-schtasks /delete /TN "\Microsoft\Windows\UpdateOrchestrator\Schedule Scan" /f > NUL 2>&1
-cls
-schtasks /delete /TN "\Microsoft\Windows\UpdateOrchestrator\Schedule Scan Static Task" /f > NUL 2>&1
-cls
-schtasks /delete /TN "\Microsoft\Windows\UpdateOrchestrator\UpdateModelTask" /f > NUL 2>&1
-cls
-schtasks /delete /TN "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker" /f > NUL 2>&1
-cls
-schtasks /delete /TN "\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenance" /f > NUL 2>&1
-cls
-schtasks /delete /TN "\Microsoft\Windows\Windows Defender\Windows Defender Cleanup" /f > NUL 2>&1
-cls
-schtasks /delete /TN "\Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan" /f > NUL 2>&1
-cls
-schtasks /delete /TN "\Microsoft\Windows\Windows Defender\Windows Defender Verification" /f > NUL 2>&1
-cls
-schtasks /delete /TN "\Microsoft\Windows\WindowsUpdate\Scheduled Start" /f > NUL 2>&1
-cls
 
-:: Add Task to restrict administrator login and display a message to the user when logging into the desktop with the administrator account
-SetLocal EnableDelayedExpansion
-(
-echo ^<?xml version="1.0" encoding="UTF-16"?^>
-echo ^<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task"^>
-echo   ^<RegistrationInfo^>
-echo     ^<Date^>2021-02-10T19:24:15.5621439^</Date^>
-echo     ^<Author^>WINDOWS-PC\Administrator^</Author^>
-echo     ^<URI^>\Log-off admin user^</URI^>
-echo   ^</RegistrationInfo^>
-echo   ^<Triggers^>
-echo     ^<LogonTrigger^>
-echo       ^<Enabled^>true^</Enabled^>
-echo       ^<UserId^>WINDOWS-PC\Administrator^</UserId^>
-echo     ^</LogonTrigger^>
-echo   ^</Triggers^>
-echo   ^<Principals^>
-echo     ^<Principal id="Author"^>
-echo       ^<UserId^>System^</UserId^>
-echo       ^<LogonType^>InteractiveToken^</LogonType^>
-echo       ^<RunLevel^>LeastPrivilege^</RunLevel^>
-echo     ^</Principal^>
-echo   ^</Principals^>
-echo   ^<Settings^>
-echo     ^<MultipleInstancesPolicy^>IgnoreNew^</MultipleInstancesPolicy^>
-echo     ^<DisallowStartIfOnBatteries^>true^</DisallowStartIfOnBatteries^>
-echo     ^<StopIfGoingOnBatteries^>true^</StopIfGoingOnBatteries^>
-echo     ^<AllowHardTerminate^>true^</AllowHardTerminate^>
-echo     ^<StartWhenAvailable^>false^</StartWhenAvailable^>
-echo     ^<RunOnlyIfNetworkAvailable^>false^</RunOnlyIfNetworkAvailable^>
-echo     ^<IdleSettings^>
-echo       ^<StopOnIdleEnd^>true^</StopOnIdleEnd^>
-echo       ^<RestartOnIdle^>false^</RestartOnIdle^>
-echo     ^</IdleSettings^>
-echo     ^<AllowStartOnDemand^>true^</AllowStartOnDemand^>
-echo     ^<Enabled^>true^</Enabled^>
-echo     ^<Hidden^>false^</Hidden^>
-echo     ^<RunOnlyIfIdle^>false^</RunOnlyIfIdle^>
-echo     ^<WakeToRun^>false^</WakeToRun^>
-echo     ^<ExecutionTimeLimit^>PT72H^</ExecutionTimeLimit^>
-echo     ^<Priority^>7^</Priority^>
-echo   ^</Settings^>
-echo   ^<Actions Context="Author"^>
-echo     ^<Exec^>
-echo       ^<Command^>cmd.exe^</Command^>
-echo       ^<Arguments^>/c c:\windows\system32\logoff.exe^</Arguments^>
-echo     ^</Exec^>
-echo   ^</Actions^>
-echo ^</Task^>
-)>> C:\AME-Log-off-admin.xml
-
-SetLocal EnableDelayedExpansion
-(
-echo ^<?xml version="1.0" encoding="UTF-16"?^>
-echo ^<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task"^>
-echo  ^<RegistrationInfo^>
-echo    ^<Date^>2021-02-10T20:04:12.7491874^</Date^>
-echo    ^<Author^>WINDOWS-PC\Administrator^</Author^>
-echo    ^<URI^>\Log-off admin message^</URI^>
-echo  ^</RegistrationInfo^>
-echo  ^<Triggers^>
-echo    ^<LogonTrigger^>
-echo      ^<Enabled^>true^</Enabled^>
-echo      ^<UserId^>WINDOWS-PC\Administrator^</UserId^>
-echo    ^</LogonTrigger^>
-echo  ^</Triggers^>
-echo  ^<Principals^>
-echo    ^<Principal id="Author"^>
-echo      ^<UserId^>System^</UserId^>
-echo      ^<RunLevel^>HighestAvailable^</RunLevel^>
-echo    ^</Principal^>
-echo  ^</Principals^>
-echo  ^<Settings^>
-echo    ^<MultipleInstancesPolicy^>IgnoreNew^</MultipleInstancesPolicy^>
-echo    ^<DisallowStartIfOnBatteries^>true^</DisallowStartIfOnBatteries^>
-echo    ^<StopIfGoingOnBatteries^>true^</StopIfGoingOnBatteries^>
-echo    ^<AllowHardTerminate^>true^</AllowHardTerminate^>
-echo    ^<StartWhenAvailable^>false^</StartWhenAvailable^>
-echo    ^<RunOnlyIfNetworkAvailable^>false^</RunOnlyIfNetworkAvailable^>
-echo    ^<IdleSettings^>
-echo      ^<StopOnIdleEnd^>true^</StopOnIdleEnd^>
-echo      ^<RestartOnIdle^>false^</RestartOnIdle^>
-echo    ^</IdleSettings^>
-echo    ^<AllowStartOnDemand^>true^</AllowStartOnDemand^>
-echo    ^<Enabled^>true^</Enabled^>
-echo    ^<Hidden^>false^</Hidden^>
-echo    ^<RunOnlyIfIdle^>false^</RunOnlyIfIdle^>
-echo    ^<DisallowStartOnRemoteAppSession^>false^</DisallowStartOnRemoteAppSession^>
-echo    ^<UseUnifiedSchedulingEngine^>true^</UseUnifiedSchedulingEngine^>
-echo    ^<WakeToRun^>false^</WakeToRun^>
-echo    ^<ExecutionTimeLimit^>PT72H^</ExecutionTimeLimit^>
-echo    ^<Priority^>7^</Priority^>
-echo  ^</Settings^>
-echo  ^<Actions Context="Author"^>
-echo    ^<Exec^>
-echo      ^<Command^>powershell.exe^</Command^>
-echo      ^<Arguments^>Write-Output  'Logging in as the Administrator user is not supported on AME.' 'Please login using a different account.' ^| Msg *^</Arguments^>
-echo    ^</Exec^>
-echo  ^</Actions^>
-echo ^</Task^>
-)>> C:\AME-Log-off-admin-message.xml
-
-schtasks /create /xml C:\AME-Log-off-admin.xml /tn "AME Log-off admin" /ru administrator /it
-schtasks /create /xml C:\AME-Log-off-admin-message.xml /tn "AME Log-off admin message" /ru administrator /it
 
 :: Registry Edits
 cls
@@ -293,7 +161,7 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost" /v ContentEvalu
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Metadata" /f > NUL 2>&1
 
 :: New Control Panel cleanup - List of commands: https://winaero.com/ms-settings-commands-in-windows-10/
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v SettingsPageVisibility /t REG_SZ /d "showonly:display;nightlight;sound;notifications;quiethours;powersleep;batterysaver;tabletmode;multitasking;clipboard;remote-desktop;about;bluetooth;connecteddevices;printers;mousetouchpad;devices-touchpad;typing;pen;autoplay;usb;network-status;network-cellular;network-wifi;network-wificalling;network-wifisettings;network-ethernet;network-dialup;network-vpn;network-airplanemode;network-mobilehotspot;datausage;network-proxy;personalization-background;personalization-start;fonts;colors;lockscreen;themes;taskbar;defaultapps;videoplayback;startupapps;dateandtime;regionformatting;gaming;gamemode;easeofaccess-display;easeofaccess-colorfilter;easeofaccess-audio;easeofaccess-easeofaccess-narrator;easeofaccess-magnifier;easeofaccess-highcontrast;easeofaccess-closedcaptioning;easeofaccess-speechrecognition;easeofaccess-eyecontrol;easeofaccess-keyboard;easeofaccess-mouse;cortana-windowssearch;search-moredetails" /f > NUL 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v SettingsPageVisibility /t REG_SZ /d "showonly:display;nightlight;sound;notifications;quiethours;powersleep;batterysaver;tabletmode;multitasking;clipboard;remote-desktop;about;bluetooth;connecteddevices;printers;mousetouchpad;devices-touchpad;typing;pen;autoplay;usb;network-status;network-cellular;network-wifi;network-wificalling;network-wifisettings;network-ethernet;network-dialup;network-vpn;network-airplanemode;network-mobilehotspot;datausage;network-proxy;personalization-background;personalization-start;fonts;colors;lockscreen;themes;taskbar;defaultapps;videoplayback;startupapps;dateandtime;regionformatting;gaming;gamemode;easeofaccess-display;easeofaccess-colorfilter;easeofaccess-audio;easeofaccess-easeofaccess-narrator;easeofaccess-magnifier;easeofaccess-highcontrast;easeofaccess-closedcaptioning;easeofaccess-speechrecognition;easeofaccess-eyecontrol;easeofaccess-keyboard;easeofaccess-mouse;cortana-windowssearch;search-moredetails;windowsupdate" /f > NUL 2>&1
 
 :: Decrease shutdown time
 reg add "HKCU\Control Panel\Desktop" /v WaitToKillAppTimeOut /t REG_SZ /d 2000 /f > NUL 2>&1
@@ -464,8 +332,6 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeI
 ::Disable Users On Login Screen
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v dontdisplaylastusername /t REG_DWORD /d 1 /f > NUL 2>&1
 
-::Disable The Lock Screen
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoLockScreen /t REG_DWORD /d 1 /f > NUL 2>&1
 
 
 :: Removing AppXPackages, the ModernUI Apps, including Cortana
@@ -490,25 +356,17 @@ PowerShell -Command "Get-AppxPackage *FeedbackHub* | Remove-AppxPackage"
 call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *MixedReality* | Remove-AppxPackage"
 call :title_remove_appx_packages
-PowerShell -Command "Get-AppxPackage *Microsoft.Caclulator* | Remove-AppxPackage"
-call :title_remove_appx_packages
-PowerShell -Command "Get-AppxPackage *Microsoft.WindowsAlarms* | Remove-AppxPackage"
-call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *Microsoft.GetHelp* | Remove-AppxPackage"
 call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *Getstarted* | Remove-AppxPackage"
 call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *Microsoft.OneConnect* | Remove-AppxPackage"
 call :title_remove_appx_packages
-PowerShell -Command "Get-AppxPackage *WindowsAlarms* | Remove-AppxPackage"
-call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *WindowsCamera* | Remove-AppxPackage"
 call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *bing* | Remove-AppxPackage"
 call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *Sticky* | Remove-AppxPackage"
-call :title_remove_appx_packages
-PowerShell -Command "Get-AppxPackage *Store* | Remove-AppxPackage"
 call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *MicrosoftOfficeHub* | Remove-AppxPackage"
 call :title_remove_appx_packages
@@ -544,21 +402,13 @@ PowerShell -Command "Get-AppxPackage *windowscommunicationsapps* | Remove-AppxPa
 call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *zune* | Remove-AppxPackage"
 call :title_remove_appx_packages
-PowerShell -Command "Get-AppxPackage *WindowsCalculator* | Remove-AppxPackage"
-call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *WindowsMaps* | Remove-AppxPackage"
 call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *Sway* | Remove-AppxPackage"
 call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *CommsPhone* | Remove-AppxPackage"
 call :title_remove_appx_packages
-PowerShell -Command "Get-AppxPackage *ConnectivityStore* | Remove-AppxPackage"
-call :title_remove_appx_packages
 PowerShell -Command "Get-AppxPackage *Microsoft.Messaging* | Remove-AppxPackage"
-call :title_remove_appx_packages
-PowerShell -Command "Get-AppxPackage *ContentDeliveryManager* | Remove-AppxPackage"
-call :title_remove_appx_packages
-PowerShell -Command "Get-AppxPackage *Microsoft.WindowsStore* | Remove-AppxPackage"
 call :title_remove_appx_packages
 :: Remove Edge, both the new and old version
 cd "C:\Program Files (x86)\Microsoft\Edge\Application\8*\Installer"
@@ -670,12 +520,6 @@ FIND /C /I "cs1.wpc.v0cdn.net" %WINDIR%\system32\drivers\etc\hosts > NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 ECHO %NEWLINE%^0.0.0.0 cs1.wpc.v0cdn.net>>%WINDIR%\System32\drivers\etc\hosts
 FIND /C /I "a-0001.a-msedge.net" %WINDIR%\system32\drivers\etc\hosts > NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 ECHO %NEWLINE%^0.0.0.0 a-0001.a-msedge.net>>%WINDIR%\System32\drivers\etc\hosts
-FIND /C /I "fe2.update.microsoft.com.akadns.net" %WINDIR%\system32\drivers\etc\hosts > NUL 2>&1
-IF %ERRORLEVEL% NEQ 0 ECHO %NEWLINE%^0.0.0.0 fe2.update.microsoft.com.akadns.net>>%WINDIR%\System32\drivers\etc\hosts
-FIND /C /I "statsfe2.update.microsoft.com.akadns.net" %WINDIR%\system32\drivers\etc\hosts > NUL 2>&1
-IF %ERRORLEVEL% NEQ 0 ECHO %NEWLINE%^0.0.0.0 statsfe2.update.microsoft.com.akadns.net>>%WINDIR%\System32\drivers\etc\hosts
-FIND /C /I "sls.update.microsoft.com.akadns.net" %WINDIR%\system32\drivers\etc\hosts > NUL 2>&1
-IF %ERRORLEVEL% NEQ 0 ECHO %NEWLINE%^0.0.0.0 sls.update.microsoft.com.akadns.net>>%WINDIR%\System32\drivers\etc\hosts
 FIND /C /I "diagnostics.support.microsoft.com" %WINDIR%\system32\drivers\etc\hosts > NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 ECHO %NEWLINE%^0.0.0.0 diagnostics.support.microsoft.com>>%WINDIR%\System32\drivers\etc\hosts
 FIND /C /I "corp.sts.microsoft.com" %WINDIR%\system32\drivers\etc\hosts > NUL 2>&1
@@ -777,147 +621,9 @@ timeout /t 1 /nobreak > NUL
 
 @powershell -NoProfile -ExecutionPolicy Bypass -Command "choco install -y --force --allow-empty-checksums firefox thunderbird open-shell vlc 7zip jpegview vcredist-all directx python3 onlyoffice wget cascadiamono"
 
-:: Remove Windows Security from Start Menu
-cls
-echo.
-echo  :: Installing Packages...
-echo.
-PowerShell -Command "wget -O PSTools.zip https://download.sysinternals.com/files/PSTools.zip"
-PowerShell -Command "wget -O remove_SecHealthUI_stub.py https://git.ameliorated.info/malte/scripts/raw/branch/master/PYTHON/remove_SecHealthUI_stub.py"
-7z e PSTools.zip psexec.exe -y
-start psexec.exe -i -s cmd.exe /c %CD%\remove_SecHealthUI_stub.py
-timeout /t 5 /nobreak > NUL
-@powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-AppxPackage -all *Microsoft.Windows.SecHealthUI* | Remove-AppPackage -AllUsers"
-del psexec.exe
-del PSTools.zip
-del remove_SecHealthUI_stub.py
 
-:: Configure Open-Shell
-:testos
-cls
-echo.
-echo :: Configuring Open-Shell
-echo.
-echo Due to restrictions with batch scripting it is required that you to 
-echo manually open the Open-Shell start menu for the first time.
-echo.
-echo Instructions:
-echo   1. Click Start
-echo   2. Click OK to close the Open-Shell Settings window
-echo   3. Open the Start Menu once more and then return to the CMD window
-echo.
-echo Press any key to continue:
-echo.
-pause > NUL
-set SHRTCT="%HOMEDRIVE%\Users\%username%\AppData\Roaming\OpenShell\Pinned\startscreen.lnk"
-if exist %SHRTCT% (
-	del %HOMEDRIVE%\Users\%username%\AppData\Roaming\OpenShell\Pinned\startscreen.lnk /f /q > NUL 2>&1
-	goto configureopenshell
-) else (
-	goto testos
-)
 
-:configureopenshell
-for /f "tokens=* USEBACKQ" %%i in (`wmic useraccount where "name="%username%"" get sid ^| findstr "S-"`) do set currentusername=%%i
-set currentusername=%currentusername:~0,-3%
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell" /t REG_SZ /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\OpenShell" /t REG_SZ /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\OpenShell\Settings" /t REG_SZ /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu" /t REG_SZ /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /t REG_SZ /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\ClassicExplorer" /t REG_SZ /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\ClassicExplorer\Settings" /t REG_SZ /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\ClassicExplorer" /v "ShowedToolbar" /t REG_DWORD /d 1 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\ClassicExplorer" /v "NewLine" /t REG_DWORD /d 0 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\ClassicExplorer\Settings" /v "ShowStatusBar" /t REG_DWORD /d 0 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu" /v "ShowedStyle2" /t REG_DWORD /d 1 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu" /v "CSettingsDlg" /t REG_BINARY /d c80100001a0100000000000000000000360d00000100000000000000 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu" /v "OldItems" /t REG_BINARY /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu" /v "ItemRanks" /t REG_BINARY /d 0 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\MRU" /v "0" /t REG_SZ /d "C:\Windows\regedit.exe" /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "Version" /t REG_DWORD /d 04040098 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "AllProgramsMetro" /t REG_DWORD /d 1 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "RecentMetroApps" /t REG_DWORD /d 1 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "StartScreenShortcut" /t REG_DWORD /d 0 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "SearchInternet" /t REG_DWORD /d 0 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "SearchPath" /t REG_DWORD /d 1 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "GlassOverride" /t REG_DWORD /d 1 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "GlassColor" /t REG_DWORD /d 0 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "SkinW7" /t REG_SZ /d "Midnight" /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "SkinVariationW7" /t REG_SZ /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "SkinOptionsW7" /t REG_MULTI_SZ /d "USER_IMAGE=1"\0"SMALL_ICONS=0"\0"LARGE_FONT=0"\0"DISABLE_MASK=0"\0"OPAQUE=0"\0"TRANSPARENT_LESS=0"\0"TRANSPARENT_MORE=1"\0"WHITE_SUBMENUS2=0" /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "SkipMetro" /t REG_DWORD /d 1 /f > NUL 2>&1
-reg add "HKEY_USERS\%currentusername%\SOFTWARE\OpenShell\StartMenu\Settings" /v "MenuItems7" /t REG_MULTI_SZ /d "Item1.Command=user_files"\0"Item1.Settings=NOEXPAND"\0"Item2.Command=user_documents"\0"Item2.Settings=NOEXPAND"\0"Item3.Command=user_pictures"\0"Item3.Settings=NOEXPAND"\0"Item4.Command=user_music"\0"Item4.Settings=NOEXPAND"\0"Item5.Command=user_videos"\0"Item5.Settings=NOEXPAND"\0"Item6.Command=downloads"\0"Item6.Settings=NOEXPAND"\0"Item7.Command=homegroup"\0"Item7.Settings=ITEM_DISABLED"\0"Item8.Command=separator"\0"Item9.Command=games"\0"Item9.Settings=TRACK_RECENT|NOEXPAND|ITEM_DISABLED"\0"Item10.Command=favorites"\0"Item10.Settings=ITEM_DISABLED"\0"Item11.Command=recent_documents"\0"Item12.Command=computer"\0"Item12.Settings=NOEXPAND"\0"Item13.Command=network"\0"Item13.Settings=ITEM_DISABLED"\0"Item14.Command=network_connections"\0"Item14.Settings=ITEM_DISABLED"\0"Item15.Command=separator"\0"Item16.Command=control_panel"\0"Item16.Settings=TRACK_RECENT"\0"Item17.Command=pc_settings"\0"Item17.Settings=TRACK_RECENT"\0"Item18.Command=admin"\0"Item18.Settings=TRACK_RECENT|ITEM_DISABLED"\0"Item19.Command=devices"\0"Item19.Settings=ITEM_DISABLED"\0"Item20.Command=defaults"\0"Item20.Settings=ITEM_DISABLED"\0"Item21.Command=help"\0"Item21.Settings=ITEM_DISABLED"\0"Item22.Command=run"\0"Item23.Command=apps"\0"Item23.Settings=ITEM_DISABLED"\0"Item24.Command=windows_security"\0"Item24.Settings=ITEM_DISABLED"\0" /f > NUL 2>&1
-
-:: Creates a shortcut in the Open-Shell start menu
-SETLOCAL ENABLEDELAYEDEXPANSION
-SET LinkName=Firefox
-SET Esc_LinkDest=%%HOMEDRIVE%%\Users\%username%\AppData\Roaming\OpenShell\Pinned\!LinkName!.lnk
-SET Esc_LinkTarget=%%HOMEDRIVE%%\Program Files\Mozilla Firefox\Firefox.exe
-SET cSctVBS=CreateShortcut.vbs
-(
-  echo Set oWS = WScript.CreateObject^("WScript.Shell"^) 
-  echo sLinkFile = oWS.ExpandEnvironmentStrings^("!Esc_LinkDest!"^)
-  echo Set oLink = oWS.CreateShortcut^(sLinkFile^) 
-  echo oLink.TargetPath = oWS.ExpandEnvironmentStrings^("!Esc_LinkTarget!"^)
-  echo oLink.Save
-)1>!cSctVBS!
-cscript //nologo .\!cSctVBS!
-DEL !cSctVBS! /f /q
-
-SETLOCAL ENABLEDELAYEDEXPANSION
-SET LinkName=Mozilla Thunderbird
-SET Esc_LinkDest=%%HOMEDRIVE%%\Users\user\AppData\Roaming\OpenShell\Pinned\!LinkName!.lnk
-SET Esc_LinkTarget=%%HOMEDRIVE%%\Program Files\Mozilla Thunderbird\Thunderbird.exe
-SET cSctVBS=CreateShortcut.vbs
-(
-  echo Set oWS = WScript.CreateObject^("WScript.Shell"^) 
-  echo sLinkFile = oWS.ExpandEnvironmentStrings^("!Esc_LinkDest!"^)
-  echo Set oLink = oWS.CreateShortcut^(sLinkFile^) 
-  echo oLink.TargetPath = oWS.ExpandEnvironmentStrings^("!Esc_LinkTarget!"^)
-  echo oLink.Save
-)1>!cSctVBS!
-cscript //nologo .\!cSctVBS!
-DEL !cSctVBS! /f /q
-
-del silent_installers.7z /f /q > NUL 2>&1
-del OldNewExplorerCfg.exe /f /q > NUL 2>&1
-del OldCalculatorforWindows10Cfg.exe /f /q > NUL 2>&1
-del hardentoolsCfg.exe /f /q > NUL 2>&1
-
-:: Download and configure OldNewExplorer
-cls
-echo.
-echo  :: Installing Third Party Programs
-echo.
-echo Downloading...
-PowerShell -Command "wget -O silent_installers.7z https://wiki.ameliorated.info/lib/exe/fetch.php?media=silent_installers.7z" > NUL 2>&1
-cls
-echo.
-echo  :: Installing Third Party Programs
-echo.
-echo Extracting...
-7z x silent_installers.7z > NUL 2>&1
-cls
-echo.
-echo  :: Installing OldNewExplorer
-echo.
-echo Installing, please wait...
-start OldNewExplorerCfg.exe > NUL 2>&1
-timeout /t 15 /nobreak
-taskkill /f /im explorer.exe > NUL 2>&1
-taskkill /f /im OldNewExplorerCfg.exe > NUL 2>&1
-start OldNewExplorerCfg.exe > NUL 2>&1
-timeout /t 15 /nobreak
-taskkill /f /im OldNewExplorerCfg.exe > NUL 2>&1
-cls
-echo.
-echo  :: Installing Old Calculator for Windows 10
-echo.
-start OldCalculatorforWindows10Cfg.exe > NUL 2>&1
-timeout /t 10 /nobreak
-cls
-echo.
+cho.
 echo  :: Installing hardentools
 echo.
 start hardentoolsCfg.exe > NUL 2>&1
